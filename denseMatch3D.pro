@@ -16,16 +16,18 @@ CONFIG += console
 PKGCONFIG = opencv-2.4.10
 PKGCONFIG = libfreenect
 
-SOURCES += main.cpp \
-    scorefunc.cpp \
-    pclQviewer.cpp \
-    seedpropagation.cpp
+SOURCES += \
+    src/seedpropagation.cpp \
+    src/scorefunc.cpp \
+    src/pclQviewer.cpp \
+    src/main.cpp
 
-HEADERS  += commonFunc.h \
-    commonHeader.h \
-    scorefunc.h \
-    pclQviewer.h \
-    seedpropagation.h
+HEADERS  += \
+    src/seedpropagation.h \
+    src/scorefunc.h \
+    src/pclQviewer.h \
+    src/commonFunc.h \
+    src/commonHeader.h
 
 INCLUDEPATH += /usr/include/vtk-5.8 \
                 /usr/local/include/pcl-1.8 \
@@ -68,5 +70,8 @@ LIBS += -L/usr/lib \
             -lvtkGraphics
 
 FORMS += \
-    pclQviewer.ui
+    src/pclQviewer.ui
+
+OTHER_FILES += \
+    src/README.md
 

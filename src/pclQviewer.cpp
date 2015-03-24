@@ -1,7 +1,6 @@
 #include "pclQviewer.h"
 #include "ui_pclQviewer.h"
 
-
 #include <fstream>
 #include <pcl/recognition/distance_map.h>
 

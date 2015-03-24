@@ -34,7 +34,7 @@ Todo
 - [ ] Finish this README file
 - [ ] See doc/README
 - [ ] Change the linece file
-- [ ] Move files around, so that fits the structure
+- [x] Move files around, so that fits the structure
 - [ ] 
 
 

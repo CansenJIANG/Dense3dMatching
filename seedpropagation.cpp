@@ -77,18 +77,3 @@ void seedPropagation::copyIdxPtsFromCloud(const std::vector<s16> &idx,
         idxPts->points.push_back(cloud->points.at(idx[i]));
     }
 }
-
-/////////////////////////////////////////////////////////////////////////////////////
-/// Func to search cloest point without using knn tree
-/////////////////////////////////////////////////////////////////////////////////////
-void seedPropagation::matchKnnNeighbors(const PointCloudT::Ptr &knnRef,
-                                        const PointCloudT::Ptr &knnMot,
-                                        std::vector<s16> knnIdxRef,
-                                        std::vector<s16> knnIdxMot,
-                                        const std::vector< triplet<s16, s16, f32> > newMatches)
-{
-    for(uc8 i=0; i<idx.size(); i++)
-    {
-        idxPts->points.push_back(cloud->points.at(idx[i]));
-    }
-}

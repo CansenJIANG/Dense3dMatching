@@ -114,6 +114,14 @@ typedef pcl::SHOT1344 SHOT1344;
 #define PI 3.141592654
 #endif
 
+// triple
+template<typename T1, typename T2, typename T3>
+struct triplet
+{
+    T1 first;
+    T2 middle;
+    T3 last;
+};
 #endif // COMMONHEADER_H
 
 

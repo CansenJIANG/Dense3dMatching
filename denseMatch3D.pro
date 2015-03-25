@@ -13,6 +13,8 @@ TEMPLATE = app
 
 CONFIG +=link_pkgconfig
 CONFIG += console
+CONFIG += c++11
+
 PKGCONFIG = opencv-2.4.10
 PKGCONFIG = libfreenect
 

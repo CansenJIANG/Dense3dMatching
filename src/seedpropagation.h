@@ -41,6 +41,11 @@ public:
     void copyIdxPtsFromCloud(const std::vector<s16> &idx,
                              const PointCloudT::Ptr &cloud,
                              PointCloudT::Ptr &idxPts);
+
+    // search cloest matching without using knn tree
+    void matchKnnNeighbors(const PointCloudT::Ptr &knnRef, const PointCloudT::Ptr &knnMot,
+                           std::vector<s16> knnIdxRef, std::vector<s16> knnIdxMot,
+                           const std::vector< triplet<s16, s16, f32> > newMatches);
 };
 
 #endif // SEEDPROPAGATION_H

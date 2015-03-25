@@ -83,8 +83,9 @@ void seedPropagation::copyIdxPtsFromCloud(const std::vector<s16> &idx,
 /////////////////////////////////////////////////////////////////////////////////////
 void seedPropagation::matchKnnNeighbors(const PointCloudT::Ptr &knnRef,
                                         const PointCloudT::Ptr &knnMot,
-                                        const std::vector<s16> &idx,
-                         const PointCloudT::Ptr &cloud, PointCloudT::Ptr &idxPts)
+                                        std::vector<s16> knnIdxRef,
+                                        std::vector<s16> knnIdxMot,
+                                        const std::vector< triplet<s16, s16, f32> > newMatches)
 {
     for(uc8 i=0; i<idx.size(); i++)
     {

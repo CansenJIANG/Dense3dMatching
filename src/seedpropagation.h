@@ -22,8 +22,8 @@ public:
     seedPropagation();
 
     // match point cloud in a small region
-    void localMatching(const PointCloudT::Ptr &cloudRef, const PointCloudT::Ptr &seedRef,
-                       const PointCloudT::Ptr &cloudMot, const PointCloudT::Ptr &seedMot,
+    void localMatching(const PointCloudT::Ptr &cloudRef, const PointCloudT::Ptr &cloudMot,
+                       const PointCloudT::Ptr &seedRef,  const PointCloudT::Ptr &seedMot,
                        const str_seedPropagation& strSeedPropag);
 
     // matching propagation

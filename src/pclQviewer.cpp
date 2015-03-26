@@ -590,6 +590,38 @@ void pclQviewer::on_transformPc_clicked()
     viewer->addPointCloud(cloud,"cloud");
     ui->qvtkWidget->update();
 }
+///////////////////////////////////////////////////////////////////////////////////////
+///// Change plot colors
+///////////////////////////////////////////////////////////////////////////////////////
+void pclQviewer::on_comboBox_activated(int index)
+{
+    cb_args.ptColor[0] = 0;
+    cb_args.ptColor[1] = 0;
+    cb_args.ptColor[2] = 0;
+    switch(index)
+    {
+    case 0: // Red
+    {   cb_args.ptColor[0] = 255;                             break;}
+    case 1: // Green
+    {   cb_args.ptColor[1] = 255;                             break;}
+    case 2: // Blue
+    {   cb_args.ptColor[2] = 255;                             break;}
+    case 3: // Cyan
+    {   cb_args.ptColor[0] = 255;
+        cb_args.ptColor[2] = 255;                             break;}
+    case 4: // Magenta
+    {   cb_args.ptColor[1] = 255;
+        cb_args.ptColor[2] = 255;                             break;}
+    case 5: // Black
+    {                                                         break;}
+    case 6: // White
+    {   cb_args.ptColor[0] = 255;
+        cb_args.ptColor[1] = 255;
+        cb_args.ptColor[2] = 255;                             break;}
+    default:
+    {   cb_args.ptColor[0] = 255;                             break;}
+    }
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///// func to clip the points further than threshold
@@ -624,4 +656,100 @@ void pclQviewer::on_clipPC_clicked()
 //        ui->qvtkWidget->update();
 //    }
     ui->outputMsg->appendPlainText( "Clipping is deactivated...");
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+///// activate dense matching tap
+///////////////////////////////////////////////////////////////////////////////////////
+void pclQviewer::on_dataAnalysisTab_currentChanged(int index)
+{
+    // dense matching tap is currently in used
+    if(index == 1)
+    {
+        ui->outputMsg->appendPlainText( "Select at least 3 matches \
+                                        features for two clouds ...");
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+///// Save selected features to perform dense matching
+///////////////////////////////////////////////////////////////////////////////////////
+void pclQviewer::on_saveFeat_1_clicked()
+{
+    if(featurePts->points.size()<1)
+        return;
+    // initialize the clickFeat_1 container
+    clickFeat_1.reset(new PointCloudT);
+    pcl::copyPointCloud(*featurePts, *clickFeat_1);
+    featurePts->clear();
+    ui->outputMsg->appendPlainText( "Selected features 1 saved.");
+}
+void pclQviewer::on_saveFeat_2_clicked()
+{
+    if(featurePts->points.size()<1)
+        return;
+    // initialize the clickFeat_1 container
+    clickFeat_2.reset(new PointCloudT);
+    pcl::copyPointCloud(*featurePts, *clickFeat_2);
+    featurePts->clear();
+    ui->outputMsg->appendPlainText( "Selected features 2 saved.");
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+///// Save selected features to perform dense matching
+///////////////////////////////////////////////////////////////////////////////////////
+void pclQviewer::on_showSeleMatch_clicked()
+{
+    QString showMatches = "Show Matches";
+    QString hideMatches = "Hide Matches";
+
+    if(clickFeat_1->points.size()<1 | clickFeat_2->points.size()<1)
+    {
+        return;
+    }
+    // switch show/hide state to control the visualization of keypts
+    if( QString ::compare( showMatches, ui->showSeleMatch->text(), Qt::CaseInsensitive) )
+    {
+        ui->showSeleMatch->setText(showMatches);
+        viewer->removePointCloud("selectMatches_1");
+        viewer->removePointCloud("selectMatches_2");
+        ui->outputMsg->appendPlainText(QString("Selected matches are hidden"));
+    }else
+    {
+        ui->showSeleMatch->setText(hideMatches);
+        PointColor clickedColor_1 (clickFeat_1, cb_args.ptColor[0],
+                                                cb_args.ptColor[1], cb_args.ptColor[2]);
+        viewer->addPointCloud(clickFeat_1,clickedColor_1,"selectMatches_1");
+        viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,
+                                                          10, "selectMatches_1");
+
+        PointColor clickedColor_2 (clickFeat_1, cb_args.ptColor[1],
+                                                cb_args.ptColor[0], cb_args.ptColor[2]);
+        viewer->addPointCloud(clickFeat_2,clickedColor_2,"selectMatches_2");
+        viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,
+                                                          10, "selectMatches_2");
+
+        ui->outputMsg->appendPlainText(QString("Selected matches are shown."));
+
+    }
+    ui->qvtkWidget->update();
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+///// Save selected features to perform dense matching
+///////////////////////////////////////////////////////////////////////////////////////
+void pclQviewer::on_denseLocalMatch_clicked()
+{
+    // create a matcher object
+    seedPropagation denseMatcher;
+
+    // params setting
+    seedPropaParams.colorThd = 0.0;
+    seedPropaParams.descrThd = 0.0;
+    seedPropaParams.motDist  = 0.02;
+    seedPropaParams.searchRadius = 0.03;
+
+    // local dense matching
+    denseMatcher.localMatching(cloud, cloud2, clickFeat_1, clickFeat_2, seedPropaParams);
 }

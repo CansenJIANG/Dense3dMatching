@@ -3,7 +3,8 @@
 
 // include common header files and data type configuration
 #include "commonFunc.h"
-
+#include "seedpropagation.h"
+#include "scorefunc.h"
 #include <Eigen/Core>
 
 // Visualization Toolkit (VTK)
@@ -102,6 +103,11 @@ protected:
     PointCloudT::Ptr filteredKeyPts;    // remained key points after filtering
     PointCloudT::Ptr filteredKeyPts2;   // remained key points after filtering
 
+    // params for dense matching
+    PointCloudT::Ptr clickFeat_1;
+    PointCloudT::Ptr clickFeat_2;
+    str_seedPropagation seedPropaParams;
+
     // container for point cloud colors
     bool showColor;
     std::vector<uc8> cloudR;
@@ -188,6 +194,21 @@ private slots:
     void on_shiftX_val_editingFinished();
     void on_shiftY_val_editingFinished();
     void on_shiftZ_val_editingFinished();
+
+    ///*******************************************
+    ///* Dense Matching Module                   *
+    ///*******************************************
+    void on_dataAnalysisTab_currentChanged(int index);
+
+    // save clicked matches
+    void on_saveFeat_1_clicked();
+    void on_saveFeat_2_clicked();
+    // show selected matches
+    void on_showSeleMatch_clicked();
+    // change matches color
+    void on_comboBox_activated(int index);
+    // local dense matching
+    void on_denseLocalMatch_clicked();
 
 private:
     Ui::pclQviewer *ui;

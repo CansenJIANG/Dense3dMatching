@@ -118,9 +118,9 @@ typedef pcl::SHOT1344 SHOT1344;
 template<typename T1, typename T2, typename T3>
 struct triplet
 {
-    T1 first;
-    T2 middle;
-    T3 last;
+    T1 idxRef;
+    T2 idxMot;
+    T3 matchDist;
 };
 #endif // COMMONHEADER_H
 

@@ -590,6 +590,13 @@ void pclQviewer::on_transformPc_clicked()
     viewer->addPointCloud(cloud,"cloud");
     ui->qvtkWidget->update();
 }
+
+void pclQviewer::transformPC(PointCloudT::Ptr &cloudIn,
+                             PointCloudT::Ptr &cloudOut,
+                             Eigen::Matrix4f &transMat)
+{
+    pcl::transformPointCloud(*cloudIn, *cloudOut, transMat);
+}
 ///////////////////////////////////////////////////////////////////////////////////////
 ///// Change plot colors
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -721,13 +728,13 @@ void pclQviewer::on_showSeleMatch_clicked()
                                                 cb_args.ptColor[1], cb_args.ptColor[2]);
         viewer->addPointCloud(clickFeat_1,clickedColor_1,"selectMatches_1");
         viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,
-                                                          10, "selectMatches_1");
+                                                          15, "selectMatches_1");
 
         PointColor clickedColor_2 (clickFeat_1, cb_args.ptColor[1],
                                                 cb_args.ptColor[0], cb_args.ptColor[2]);
         viewer->addPointCloud(clickFeat_2,clickedColor_2,"selectMatches_2");
         viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,
-                                                          10, "selectMatches_2");
+                                                          15, "selectMatches_2");
 
         ui->outputMsg->appendPlainText(QString("Selected matches are shown."));
 
@@ -748,8 +755,40 @@ void pclQviewer::on_denseLocalMatch_clicked()
     seedPropaParams.colorThd = 0.0;
     seedPropaParams.descrThd = 0.0;
     seedPropaParams.motDist  = 0.02;
-    seedPropaParams.searchRadius = 0.03;
+    seedPropaParams.searchRadius = 0.01;
+    {
+        // visualize knn search
+        std::vector< std::vector<s16> > knnIdxRef, knnIdxMot;
+        denseMatcher.getKnnRadius(cloud, clickFeat_1, seedPropaParams.searchRadius, knnIdxRef);
+        denseMatcher.getKnnRadius(cloud2, clickFeat_2, seedPropaParams.searchRadius, knnIdxMot);
 
+        PointCloudT::Ptr idxPtsRef (new PointCloudT);
+        PointCloudT::Ptr idxPtsMot (new PointCloudT);
+        // Get the knn neighbors from point cloud
+        denseMatcher.copyIdxPtsFromCloud(knnIdxRef[0], cloud, idxPtsRef);
+        denseMatcher.copyIdxPtsFromCloud(knnIdxRef[1], cloud, idxPtsRef);
+        denseMatcher.copyIdxPtsFromCloud(knnIdxRef[2], cloud, idxPtsRef);
+        denseMatcher.copyIdxPtsFromCloud(knnIdxMot[0], cloud2, idxPtsMot);
+        denseMatcher.copyIdxPtsFromCloud(knnIdxMot[1], cloud2, idxPtsMot);
+        denseMatcher.copyIdxPtsFromCloud(knnIdxMot[2], cloud2, idxPtsMot);
+
+        std::cout<<"draw knn neighbors ...\n";
+
+        uc8 colorKnn_1[3] = {0, 255, 0}, colorKnn_2[3] = {255, 0, 0};
+
+        Eigen::Matrix4f transMat = Eigen::Matrix4f::Identity();
+        denseMatcher.getTransformMatrix(clickFeat_1, clickFeat_2, transMat);
+        pcl::transformPointCloud(*idxPtsRef, *idxPtsRef, transMat);
+        pcl::transformPointCloud(*clickFeat_1, *clickFeat_1, transMat);
+        pcl::transformPointCloud(*cloud, *cloud, transMat);
+
+        drawKeyPts(idxPtsRef,"feat_1", colorKnn_1,10);
+        drawKeyPts(idxPtsMot,"feat_2", colorKnn_2,10);
+        std::cout<<"draw knn neighbors done! \n";
+
+    }
     // local dense matching
     denseMatcher.localMatching(cloud, cloud2, clickFeat_1, clickFeat_2, seedPropaParams);
+
+
 }

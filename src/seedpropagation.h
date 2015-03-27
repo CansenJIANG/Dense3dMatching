@@ -36,8 +36,8 @@ public:
                       const f32 &searchRadius, std::vector< std::vector<s16> > &neighIdx);
 
     // get Knn neighbors Nearest search
-    void getKnnNearest(const PointCloudT::Ptr &cloud, const PointCloudT::Ptr &ptQuery,
-                       std::vector<s16> &neighIdx, std::vector<f32> &neighDist);
+    void getKnnNearestK(const PointCloudT::Ptr &cloud, const PointCloudT::Ptr &ptQuery,
+                        std::vector<s16> &neighIdx, std::vector<f32> &neighDist);
 
     // get the indexed points from point cloud
     void copyIdxPtsFromCloud(const std::vector<s16> &idx,
@@ -69,6 +69,11 @@ public:
                        const std::vector<s16> &knnIdxMot,
                        const std::vector<f32> &distRef2Mot,
                        std::vector< triplet<s16, s16, f32> > &newMatches);
+
+    // estimate rigid transformation from point correspondences
+    void getTransformMatrix(const PointCloudT::Ptr &featRef,
+                            const PointCloudT::Ptr &featMot,
+                            Eigen::Matrix4f &transMat);
 };
 
 #endif // SEEDPROPAGATION_H

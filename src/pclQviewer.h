@@ -72,7 +72,7 @@ struct str_keyPts{
 
 namespace Ui
 {
-    class pclQviewer;
+class pclQviewer;
 }
 
 class pclQviewer : public QMainWindow
@@ -134,8 +134,10 @@ protected:
 
     // func to draw key points
     void drawKeyPts(const PointCloudT::Ptr &keyPts, const std::string pcName,
-                       const uc8 pColor[], const uc8 ptSize);
+                    const uc8 pColor[], const uc8 ptSize);
 
+    void transformPC(PointCloudT::Ptr &cloudIn, PointCloudT::Ptr &cloudOut,
+                     Eigen::Matrix4f &transMat);
 
     // Add point picking callback to viewer:
     struct callback_args cb_args;

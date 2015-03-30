@@ -11,7 +11,7 @@ void seedPropagation::propagateMatching(const PointCloudT::Ptr &cloudRef,
                                         const PointCloudT::Ptr &seedRef,
                                         const PointCloudT::Ptr &cloudMot,
                                         const PointCloudT::Ptr &seedMot,
-                                        const str_seedPropagation &strSeedPropag)
+                                        str_seedPropagation &strSeedPropag)
 {
 
 }
@@ -34,7 +34,7 @@ void seedPropagation::getKnnNearestK(const PointCloudT::Ptr &ptQuery,
         kdTree.nearestKSearch(pQuery, 1, knnIdx, knnDist);
         neighIdx.push_back(knnIdx[0]);
         neighDist.push_back(knnDist[0]);
-//        std::cout<<"idx = "<<knnIdx[0]<<", ";
+        //        std::cout<<"idx = "<<knnIdx[0]<<", ";
     }
 }
 
@@ -119,6 +119,7 @@ void seedPropagation::crossMatching(const std::vector<s16> &idxRef2Mot,
                                     const std::vector<f32> &distRef2Mot,
                                     std::vector< triplet<s16, s16, f32> > &newMatches)
 {
+    std::cout<<"max size of matching is "<<idxRef2Mot.size()<<std::endl;
     for(u16 i=0; i<idxRef2Mot.size(); ++i)
     {
         if( i == idxMot2Ref.at(idxRef2Mot.at(i)) )
@@ -128,8 +129,10 @@ void seedPropagation::crossMatching(const std::vector<s16> &idxRef2Mot,
             matchTriplet.idxMot = knnIdxMot.at( idxRef2Mot.at(i) );
             matchTriplet.matchDist = distRef2Mot.at(i);
             newMatches.push_back(matchTriplet);
+            std::cout<<"idxRef = "<< matchTriplet.idxRef<<", idxMot = "<<matchTriplet.idxMot<<"; ";
         }
     }
+    std::cout<<"matches size after crossMatching: "<<newMatches.size()<<std::endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -162,8 +165,8 @@ void seedPropagation::matchKnnNeighbKdTree(const PointCloudT::Ptr &knnRef,
 /// Func to estimate rigid transformation from point correspondences
 /////////////////////////////////////////////////////////////////////////////////////
 void seedPropagation::getTransformMatrix(const PointCloudT::Ptr &featRef,
-                                           const PointCloudT::Ptr &featMot,
-                                           Eigen::Matrix4f &transMat)
+                                         const PointCloudT::Ptr &featMot,
+                                         Eigen::Matrix4f &transMat)
 {
     pcl::TransformationFromCorrespondences transFromCorr;
     for ( size_t i =0;i<featRef->points.size();i++)
@@ -189,7 +192,7 @@ void seedPropagation::localMatching(const PointCloudT::Ptr &cloudRef,
                                     const PointCloudT::Ptr &cloudMot,
                                     const PointCloudT::Ptr &seedRef,
                                     const PointCloudT::Ptr &seedMot,
-                                    const str_seedPropagation &strSeedPropag)
+                                    str_seedPropagation &strSeedPropag)
 {
     std::vector< std::vector<s16> > knnIdxRef;
     std::vector< std::vector<s16> > knnIdxMot;
@@ -213,7 +216,6 @@ void seedPropagation::localMatching(const PointCloudT::Ptr &cloudRef,
     {
         PointCloudT::Ptr idxPtsRef (new PointCloudT);
         PointCloudT::Ptr idxPtsMot (new PointCloudT);
-        std::vector< triplet<s16, s16, f32> > newMatches;
 
         // Get the knn neighbors from point cloud
         copyIdxPtsFromCloud(knnIdxRef[i], cloudRef, idxPtsRef);
@@ -223,8 +225,8 @@ void seedPropagation::localMatching(const PointCloudT::Ptr &cloudRef,
                 <<", idxPtsMot size: "<<idxPtsMot->points.size()<<std::endl;
 
         matchKnnNeighbKdTree(idxPtsRef, idxPtsMot, knnIdxRef[i], knnIdxMot[i],
-                             newMatches);
-        std::cout<<"size of new matches is: "<< newMatches.size()<<std::endl;
+                             strSeedPropag.denseMatches);
+        std::cout<<"size of new matches is: "<< strSeedPropag.denseMatches.size()<<std::endl;
     }
     //    PointT seedR = seedRef->points.at(0);
     //    PointT seedM = seedMot->points.at(0);

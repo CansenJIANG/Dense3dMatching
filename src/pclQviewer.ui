@@ -78,7 +78,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_3">
         <attribute name="title">
@@ -965,7 +965,7 @@
               <x>0</x>
               <y>25</y>
               <width>220</width>
-              <height>27</height>
+              <height>25</height>
              </rect>
             </property>
             <property name="minimumSize">
@@ -994,11 +994,46 @@
              </property>
             </widget>
            </widget>
-           <widget class="QSplitter" name="splitter_12">
+           <widget class="QSplitter" name="splitter_13">
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>58</y>
+              <y>124</y>
+              <width>220</width>
+              <height>25</height>
+             </rect>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>220</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Line Width</string>
+             </property>
+            </widget>
+            <widget class="QSlider" name="lineWidthSlider">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </widget>
+           <widget class="QSplitter" name="splitter_11">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>59</y>
               <width>220</width>
               <height>25</height>
              </rect>
@@ -1032,10 +1067,10 @@
               </size>
              </property>
              <property name="text">
-              <string>Show Matches</string>
+              <string>Show Pt-Pairs</string>
              </property>
             </widget>
-            <widget class="QPushButton" name="pushButton_2">
+            <widget class="QPushButton" name="denseLocalMatch">
              <property name="minimumSize">
               <size>
                <width>105</width>
@@ -1049,11 +1084,11 @@
               </size>
              </property>
              <property name="text">
-              <string>PushButton</string>
+              <string>Match Feats.</string>
              </property>
             </widget>
            </widget>
-           <widget class="QSplitter" name="splitter_11">
+           <widget class="QSplitter" name="splitter_12">
             <property name="geometry">
              <rect>
               <x>0</x>
@@ -1077,24 +1112,7 @@
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <widget class="QPushButton" name="denseLocalMatch">
-             <property name="minimumSize">
-              <size>
-               <width>105</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>105</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Match Feats.</string>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="pushButton_4">
+            <widget class="QPushButton" name="drawMatches">
              <property name="minimumSize">
               <size>
                <width>105</width>
@@ -1109,6 +1127,23 @@
              </property>
              <property name="text">
               <string>Draw Matches</string>
+             </property>
+            </widget>
+            <widget class="QPushButton" name="removeLines">
+             <property name="minimumSize">
+              <size>
+               <width>105</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>105</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Remove Lines</string>
              </property>
             </widget>
            </widget>

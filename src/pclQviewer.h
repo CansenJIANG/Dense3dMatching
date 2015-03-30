@@ -25,7 +25,7 @@ struct callback_args{
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
-/// define key point detector constructor
+/// define key point detector structure
 /////////////////////////////////////////////////////////////////////////////////////
 struct str_featDescr{
     // key point name in pcl viewer
@@ -51,7 +51,7 @@ struct str_featDescr{
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
-/// define feature descriptor constructor
+/// define feature descriptor structure
 /////////////////////////////////////////////////////////////////////////////////////
 struct str_keyPts{
     // key point detector name
@@ -69,6 +69,18 @@ struct str_keyPts{
     uc8 viewSize;
 };
 
+
+struct str_drawObjs{
+
+    // state of drawing lines
+    uc8 lineDrawOn;
+    // draw line index
+    u16 lineIdx;
+    // line width
+    f32 lineWidth;
+    // draw only good matches
+    uc8 goodMatches;
+};
 
 namespace Ui
 {
@@ -88,6 +100,7 @@ public slots:
     void pSliderValueChanged (int value);
     // slider to move point cloud along z axis
     void movePcSlider (int value);
+    void lineWidthSlider(int value);
 
 
 protected:
@@ -139,8 +152,12 @@ protected:
     void transformPC(PointCloudT::Ptr &cloudIn, PointCloudT::Ptr &cloudOut,
                      Eigen::Matrix4f &transMat);
 
+    void drawMatches(PointCloudT::Ptr &corr_1, PointCloudT::Ptr & corr_2,
+                     std::vector<f32> &matchDist, uc8 viewColor[]);
+
     // Add point picking callback to viewer:
     struct callback_args cb_args;
+    struct str_drawObjs drawObjsParams;
 
 private slots:
 
@@ -211,6 +228,10 @@ private slots:
     void on_comboBox_activated(int index);
     // local dense matching
     void on_denseLocalMatch_clicked();
+    // func to remove matching lines
+    void on_removeLines_clicked();
+
+    void on_drawMatches_clicked();
 
 private:
     Ui::pclQviewer *ui;

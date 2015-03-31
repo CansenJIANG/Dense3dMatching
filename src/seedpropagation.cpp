@@ -34,7 +34,6 @@ void seedPropagation::getKnnNearestK(const PointCloudT::Ptr &ptQuery,
         kdTree.nearestKSearch(pQuery, 1, knnIdx, knnDist);
         neighIdx.push_back(knnIdx[0]);
         neighDist.push_back(knnDist[0]);
-        //        std::cout<<"idx = "<<knnIdx[0]<<", ";
     }
 }
 
@@ -46,7 +45,6 @@ void seedPropagation::getKnnRadius(const PointCloudT::Ptr &cloud,
                                    const f32& searchRadius,
                                    std::vector< std::vector<s16> > &neighIdx)
 {
-    std::cout<<"search radius: "<<searchRadius<<std::endl;
     pcl::KdTreeFLANN<PointT> kdTree;
     kdTree.setInputCloud(cloud);
     std::vector<s16> knnIdx;
@@ -56,7 +54,6 @@ void seedPropagation::getKnnRadius(const PointCloudT::Ptr &cloud,
         PointT pQuery = ptQuery->points.at(i);
         kdTree.radiusSearch(pQuery, searchRadius, knnIdx, knnDist);
         neighIdx.push_back(knnIdx);
-        //        std::cout<<"Knn neighbors found: "<<knnIdx.size();
     }
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -66,13 +63,10 @@ void seedPropagation::copyIdxPtsFromCloud(const std::vector<s16> &idx,
                                           const PointCloudT::Ptr &cloud,
                                           PointCloudT::Ptr &idxPts)
 {
-    std::cout<<"size of neighbors: "<<idx.size()<<std::endl;
     for(u16 i=0; i<idx.size(); i++)
     {
-        //        std::cout<<"idx = "<<idx[i]<<", ";
         idxPts->points.push_back(cloud->points.at(idx[i]));
     }
-    std::cout<<"size of points: "<<idxPts->points.size()<<std::endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -84,10 +78,7 @@ void seedPropagation::matchKnnNeighbors(const PointCloudT::Ptr &knnRef,
                                         std::vector<s16> &knnIdxMot,
                                         std::vector< triplet<s16, s16, f32> > &newMatches)
 {
-    //    for(uc8 i=0; i<knnIdxRef.size(); i++)
-    //    {
-    //        idxPts->points.push_back(cloud->points.at(knnIdxRef[i]));
-    //    }
+
 }
 
 
@@ -119,7 +110,6 @@ void seedPropagation::crossMatching(const std::vector<s16> &idxRef2Mot,
                                     const std::vector<f32> &distRef2Mot,
                                     std::vector< triplet<s16, s16, f32> > &newMatches)
 {
-    std::cout<<"max size of matching is "<<idxRef2Mot.size()<<std::endl;
     for(u16 i=0; i<idxRef2Mot.size(); ++i)
     {
         if( i == idxMot2Ref.at(idxRef2Mot.at(i)) )
@@ -129,10 +119,8 @@ void seedPropagation::crossMatching(const std::vector<s16> &idxRef2Mot,
             matchTriplet.idxMot = knnIdxMot.at( idxRef2Mot.at(i) );
             matchTriplet.matchDist = distRef2Mot.at(i);
             newMatches.push_back(matchTriplet);
-            std::cout<<"idxRef = "<< matchTriplet.idxRef<<", idxMot = "<<matchTriplet.idxMot<<"; ";
         }
     }
-    std::cout<<"matches size after crossMatching: "<<newMatches.size()<<std::endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -147,8 +135,6 @@ void seedPropagation::matchKnnNeighbKdTree(const PointCloudT::Ptr &knnRef,
     std::vector<s16> idxRef2Mot,  idxMot2Ref;
     std::vector<f32> distRef2Mot, distMot2Ref;
 
-    std::cout<<"matching start...\n";
-
     // search cloest point in Euclidean Space
     getKnnNearestK(knnRef, knnMot,idxRef2Mot,distRef2Mot);
     getKnnNearestK(knnMot, knnRef,idxMot2Ref,distMot2Ref);
@@ -156,8 +142,6 @@ void seedPropagation::matchKnnNeighbKdTree(const PointCloudT::Ptr &knnRef,
     // cross matching for two sides
     crossMatching(idxRef2Mot, idxMot2Ref, knnIdxRef,
                   knnIdxMot, distRef2Mot, newMatches);
-
-    // plot feauter
 }
 
 
@@ -182,7 +166,6 @@ void seedPropagation::getTransformMatrix(const PointCloudT::Ptr &featRef,
         transFromCorr.add(from, to, 1.0);//all the same weight
     }
     transMat= transFromCorr.getTransformation().matrix();
-    std::cout<< "\ntransformation from corresponding points is \n"<<transMat<<std::endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -197,19 +180,9 @@ void seedPropagation::localMatching(const PointCloudT::Ptr &cloudRef,
     std::vector< std::vector<s16> > knnIdxRef;
     std::vector< std::vector<s16> > knnIdxMot;
 
-    std::cout<<"start local matching...\n";
-    std::cout<<"cloudRef size: "<<cloudRef->points.size()
-            <<", cloudMot size: "<<cloudMot->points.size()<<std::endl;
-
-    std::cout<<"seedRef size: "<<seedRef->points.size()
-            <<", seedMot size: "<<seedMot->points.size()<<std::endl;
-
     // get the knn neighbors of the seeds
     getKnnRadius(cloudRef, seedRef, strSeedPropag.searchRadius, knnIdxRef);
     getKnnRadius(cloudMot, seedMot, strSeedPropag.searchRadius, knnIdxMot);
-
-    std::cout<<"knnIdxRef size: "<<knnIdxRef.size()
-            <<", knnIdxMot size: "<<knnIdxMot.size()<<std::endl;
 
     // First loop for all the seeds
     for(uc8 i=0; i<seedRef->points.size();i++)
@@ -221,13 +194,8 @@ void seedPropagation::localMatching(const PointCloudT::Ptr &cloudRef,
         copyIdxPtsFromCloud(knnIdxRef[i], cloudRef, idxPtsRef);
         copyIdxPtsFromCloud(knnIdxMot[i], cloudMot, idxPtsMot);
 
-        std::cout<<"idxPtsRef size: "<<idxPtsRef->points.size()
-                <<", idxPtsMot size: "<<idxPtsMot->points.size()<<std::endl;
-
+        // match knn neighbours using KdTree search
         matchKnnNeighbKdTree(idxPtsRef, idxPtsMot, knnIdxRef[i], knnIdxMot[i],
                              strSeedPropag.denseMatches);
-        std::cout<<"size of new matches is: "<< strSeedPropag.denseMatches.size()<<std::endl;
     }
-    //    PointT seedR = seedRef->points.at(0);
-    //    PointT seedM = seedMot->points.at(0);
 }

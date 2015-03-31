@@ -609,7 +609,6 @@ pclQviewer::drawMatches(PointCloudT::Ptr &corr_1, PointCloudT::Ptr & corr_2,
         ++pt_2;
         ++idxLine;
     }
-    //    featDescrStr.lineIdx = idxLine;
     ui->qvtkWidget->update();
 }
 
@@ -623,7 +622,7 @@ pclQviewer::on_loadSelectedFeat_clicked()
 {
     // load *.pcd file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-                                                    "/home/jiang/CvData/kinect_textured/", tr("Files (*.pcd)"));
+                       "/home/jiang/CvData/kinect_textured/", tr("Files (*.pcd)"));
     if(fileName.size()<1)
     {
         return;
@@ -634,12 +633,9 @@ pclQviewer::on_loadSelectedFeat_clicked()
 
     std::string cloudName = featureName.substr(featureName.size()-8).c_str();
 
-    //    viewer->addPointCloud(feature_cloud,cloudName);
-
     // draw clicked points in green:
     PointColor clickedColor (feature_cloud, cb_args.ptColor[0],
             cb_args.ptColor[1], cb_args.ptColor[2]);
-    //    data->viewerPtr->removePointCloud("selected_features");
     viewer->addPointCloud(feature_cloud, clickedColor, cloudName);
     viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,
                                              15, cloudName);
@@ -670,10 +666,8 @@ pclQviewer::on_loadMatchIdx_clicked()
             u16 idx_tmp = 0;
             readMatchFile >> idx_tmp;
             featDescrStr.matchIdx1.push_back(idx_tmp);
-            std::cout<< idx_tmp <<", ";
             readMatchFile >> idx_tmp;
             featDescrStr.matchIdx2.push_back(idx_tmp);
-            std::cout<< idx_tmp <<"\n";
         }
     }
     readMatchFile.close();
@@ -897,7 +891,6 @@ pclQviewer::on_denseLocalMatch_clicked()
         uc8 colorKnn_1[3] = {0, 255, 0}, colorKnn_2[3] = {255, 0, 0};
         drawKeyPts(idxPtsRef,"feat_1", colorKnn_1,10);
         drawKeyPts(idxPtsMot,"feat_2", colorKnn_2,10);
-        std::cout<<"draw knn neighbors done! \n";
     }
 
     // local dense matching
@@ -928,8 +921,6 @@ void pclQviewer::on_drawMatches_clicked()
     {
         ui->removeLines->click();
     }
-    std::cout<<"size of dense matches: "
-            <<seedPropaParams.denseMatches.size()<<"\n";
 
     std::vector<f32> matchDist;
     triplet<s16,s16,f32> tmpMatch;

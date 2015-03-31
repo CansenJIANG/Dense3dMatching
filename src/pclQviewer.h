@@ -3,7 +3,8 @@
 
 // include common header files and data type configuration
 #include "commonFunc.h"
-
+#include "seedpropagation.h"
+#include "scorefunc.h"
 #include <Eigen/Core>
 
 // Visualization Toolkit (VTK)
@@ -24,7 +25,7 @@ struct callback_args{
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
-/// define key point detector constructor
+/// define key point detector structure
 /////////////////////////////////////////////////////////////////////////////////////
 struct str_featDescr{
     // key point name in pcl viewer
@@ -50,7 +51,7 @@ struct str_featDescr{
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
-/// define feature descriptor constructor
+/// define feature descriptor structure
 /////////////////////////////////////////////////////////////////////////////////////
 struct str_keyPts{
     // key point detector name
@@ -69,9 +70,21 @@ struct str_keyPts{
 };
 
 
+struct str_drawObjs{
+
+    // state of drawing lines
+    uc8 lineDrawOn;
+    // draw line index
+    u16 lineIdx;
+    // line width
+    f32 lineWidth;
+    // draw only good matches
+    uc8 goodMatches;
+};
+
 namespace Ui
 {
-    class pclQviewer;
+class pclQviewer;
 }
 
 class pclQviewer : public QMainWindow
@@ -87,6 +100,7 @@ public slots:
     void pSliderValueChanged (int value);
     // slider to move point cloud along z axis
     void movePcSlider (int value);
+    void lineWidthSlider(int value);
 
 
 protected:
@@ -101,6 +115,11 @@ protected:
     PointCloudT::Ptr featurePts2;       // feature points manually selected from the point cloud
     PointCloudT::Ptr filteredKeyPts;    // remained key points after filtering
     PointCloudT::Ptr filteredKeyPts2;   // remained key points after filtering
+
+    // params for dense matching
+    PointCloudT::Ptr clickFeat_1;
+    PointCloudT::Ptr clickFeat_2;
+    str_seedPropagation seedPropaParams;
 
     // container for point cloud colors
     bool showColor;
@@ -128,11 +147,17 @@ protected:
 
     // func to draw key points
     void drawKeyPts(const PointCloudT::Ptr &keyPts, const std::string pcName,
-                       const uc8 pColor[], const uc8 ptSize);
+                    const uc8 pColor[], const uc8 ptSize);
 
+    void transformPC(PointCloudT::Ptr &cloudIn, PointCloudT::Ptr &cloudOut,
+                     Eigen::Matrix4f &transMat);
+
+    void drawMatches(PointCloudT::Ptr &corr_1, PointCloudT::Ptr & corr_2,
+                     std::vector<f32> &matchDist, uc8 viewColor[]);
 
     // Add point picking callback to viewer:
     struct callback_args cb_args;
+    struct str_drawObjs drawObjsParams;
 
 private slots:
 
@@ -188,6 +213,25 @@ private slots:
     void on_shiftX_val_editingFinished();
     void on_shiftY_val_editingFinished();
     void on_shiftZ_val_editingFinished();
+
+    ///*******************************************
+    ///* Dense Matching Module                   *
+    ///*******************************************
+    void on_dataAnalysisTab_currentChanged(int index);
+
+    // save clicked matches
+    void on_saveFeat_1_clicked();
+    void on_saveFeat_2_clicked();
+    // show selected matches
+    void on_showSeleMatch_clicked();
+    // change matches color
+    void on_comboBox_activated(int index);
+    // local dense matching
+    void on_denseLocalMatch_clicked();
+    // func to remove matching lines
+    void on_removeLines_clicked();
+
+    void on_drawMatches_clicked();
 
 private:
     Ui::pclQviewer *ui;

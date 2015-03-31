@@ -799,9 +799,10 @@ pclQviewer::on_saveFeat_1_clicked()
     // initialize the clickFeat_1 container
     clickFeat_1.reset(new PointCloudT);
     pcl::copyPointCloud(*featurePts, *clickFeat_1);
-    featurePts->clear();
+    on_cleanFeatures_clicked();
     ui->outputMsg->appendPlainText( "Selected features 1 saved.");
 }
+
 void
 pclQviewer::on_saveFeat_2_clicked()
 {
@@ -810,7 +811,7 @@ pclQviewer::on_saveFeat_2_clicked()
     // initialize the clickFeat_1 container
     clickFeat_2.reset(new PointCloudT);
     pcl::copyPointCloud(*featurePts, *clickFeat_2);
-    featurePts->clear();
+    on_cleanFeatures_clicked();
     ui->outputMsg->appendPlainText( "Selected features 2 saved.");
 }
 
@@ -865,16 +866,26 @@ pclQviewer::on_denseLocalMatch_clicked()
     // create a matcher object
     seedPropagation denseMatcher;
     Eigen::Matrix4f transMat = Eigen::Matrix4f::Identity();
-    //    seedPropagation.denseMatches->;
-    {
-        // visualize knn search
+
+    // rigid transformation of point cloud from sparse matches
+    denseMatcher.getTransformMatrix(clickFeat_1, clickFeat_2, transMat);
+
+    // point cloud alignment using inverse of rigid transformation
+    pcl::transformPointCloud(*clickFeat_1, *clickFeat_1, transMat);
+    pcl::transformPointCloud(*cloud, *cloud, transMat);
+
+
+    if (0)
+    {// Visualize knn neighbors
+
         std::vector< std::vector<s16> > knnIdxRef, knnIdxMot;
+        // get knn neighbors within a Radius
         denseMatcher.getKnnRadius(cloud, clickFeat_1, seedPropaParams.searchRadius, knnIdxRef);
         denseMatcher.getKnnRadius(cloud2, clickFeat_2, seedPropaParams.searchRadius, knnIdxMot);
 
         PointCloudT::Ptr idxPtsRef (new PointCloudT);
         PointCloudT::Ptr idxPtsMot (new PointCloudT);
-        // Get the knn neighbors from point cloud
+        // get the knn neighbors from point cloud
         denseMatcher.copyIdxPtsFromCloud(knnIdxRef[0], cloud, idxPtsRef);
         denseMatcher.copyIdxPtsFromCloud(knnIdxRef[1], cloud, idxPtsRef);
         denseMatcher.copyIdxPtsFromCloud(knnIdxRef[2], cloud, idxPtsRef);
@@ -882,31 +893,30 @@ pclQviewer::on_denseLocalMatch_clicked()
         denseMatcher.copyIdxPtsFromCloud(knnIdxMot[1], cloud2, idxPtsMot);
         denseMatcher.copyIdxPtsFromCloud(knnIdxMot[2], cloud2, idxPtsMot);
 
-        std::cout<<"draw knn neighbors ...\n";
-
+        // show the knn neighbors
         uc8 colorKnn_1[3] = {0, 255, 0}, colorKnn_2[3] = {255, 0, 0};
-
-        denseMatcher.getTransformMatrix(clickFeat_1, clickFeat_2, transMat);
-        pcl::transformPointCloud(*idxPtsRef, *idxPtsRef, transMat);
-        pcl::transformPointCloud(*clickFeat_1, *clickFeat_1, transMat);
-        pcl::transformPointCloud(*cloud, *cloud, transMat);
-
-//        drawKeyPts(idxPtsRef,"feat_1", colorKnn_1,10);
-//        drawKeyPts(idxPtsMot,"feat_2", colorKnn_2,10);
+        drawKeyPts(idxPtsRef,"feat_1", colorKnn_1,10);
+        drawKeyPts(idxPtsMot,"feat_2", colorKnn_2,10);
         std::cout<<"draw knn neighbors done! \n";
     }
+
     // local dense matching
     denseMatcher.localMatching(cloud, cloud2, clickFeat_1, clickFeat_2, seedPropaParams);
 
+    // shift point cloud to visualize the matching result
     transMat = Eigen::Matrix4f::Identity();
     transMat(2,3) = 0.2;
     pcl::transformPointCloud(*clickFeat_1, *clickFeat_1, transMat);
     pcl::transformPointCloud(*cloud, *cloud, transMat);
     viewer->removePointCloud("cloud");
     viewer->addPointCloud(cloud, "cloud");
+    ui->showSeleMatch->click();
     ui->qvtkWidget->update();
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+///// Save draw dense matching
+///////////////////////////////////////////////////////////////////////////////////////
 void pclQviewer::on_drawMatches_clicked()
 {
     if(seedPropaParams.denseMatches.size()<1){return;}

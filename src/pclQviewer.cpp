@@ -611,10 +611,8 @@ pclQviewer::drawMatches(PointCloudT::Ptr &corr_1, PointCloudT::Ptr & corr_2,
         ++pt_2;
         ++idxLine;
     }
-<<<<<<< HEAD
-=======
+
     drawObjsParams.lineIdx = idxLine;
->>>>>>> develop
     ui->qvtkWidget->update();
 }
 
@@ -990,14 +988,10 @@ pclQviewer::on_denseLocalMatch_clicked()
 
         // show the knn neighbors
         uc8 colorKnn_1[3] = {0, 255, 0}, colorKnn_2[3] = {255, 0, 0};
-<<<<<<< HEAD
-        drawKeyPts(idxPtsRef,"feat_1", colorKnn_1,10);
-        drawKeyPts(idxPtsMot,"feat_2", colorKnn_2,10);
-=======
+
         drawKeyPts(idxPtsRef,"feat_1", colorKnn_1, 10);
         drawKeyPts(idxPtsMot,"feat_2", colorKnn_2, 10);
         std::cout<<"draw knn neighbors done! \n";
->>>>>>> develop
     }
 
     // local dense matching
@@ -1024,15 +1018,8 @@ void pclQviewer::on_propaMatch_clicked()
     seedPropagation denseMatcher;
     Eigen::Matrix4f transMat = Eigen::Matrix4f::Identity();
 
-<<<<<<< HEAD
-    if(drawObjsParams.lineIdx != 0)
-    {
-        ui->removeLines->click();
-    }
-=======
     // rigid transformation of point cloud from sparse matches
     denseMatcher.getTransformMatrix(clickFeat_1, clickFeat_2, transMat);
->>>>>>> develop
 
     // point cloud alignment using inverse of rigid transformation
     pcl::transformPointCloud(*clickFeat_1, *clickFeat_1, transMat);

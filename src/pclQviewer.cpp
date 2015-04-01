@@ -783,8 +783,6 @@ void pclQviewer::on_drawMatches_clicked()
     {
         ui->removeLines->click();
     }
-    std::cout<<"size of dense matches: "
-            <<seedPropaParams.denseMatches.size()<<"\n";
 
     std::vector<f32> matchDist;
     triplet<s16,s16,f32> tmpMatch;
@@ -991,7 +989,6 @@ pclQviewer::on_denseLocalMatch_clicked()
 
         drawKeyPts(idxPtsRef,"feat_1", colorKnn_1, 10);
         drawKeyPts(idxPtsMot,"feat_2", colorKnn_2, 10);
-        std::cout<<"draw knn neighbors done! \n";
     }
 
     // local dense matching

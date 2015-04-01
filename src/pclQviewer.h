@@ -230,8 +230,16 @@ private slots:
     void on_denseLocalMatch_clicked();
     // func to remove matching lines
     void on_removeLines_clicked();
-
+    // func to draw matching lines
     void on_drawMatches_clicked();
+    // func to assign searching radius for dense matching
+    void on_denseSearchRadius_editingFinished();
+    // func to show dense point matching pairs
+    void on_showDensePairs_clicked();
+    // func to dense matching using propagation
+    void on_propaMatch_clicked();
+
+    void on_propaNumber_editingFinished();
 
 private:
     Ui::pclQviewer *ui;

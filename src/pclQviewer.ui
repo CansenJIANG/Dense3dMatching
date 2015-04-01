@@ -78,7 +78,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="tab_3">
         <attribute name="title">
@@ -941,228 +941,436 @@
         <attribute name="title">
          <string>DenseMatch</string>
         </attribute>
-        <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="geometry">
+          <rect>
+           <x>9</x>
+           <y>9</y>
+           <width>220</width>
+           <height>341</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>220</width>
+           <height>250</height>
+          </size>
+         </property>
+         <property name="sizeIncrement">
+          <size>
+           <width>220</width>
+           <height>250</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Local Dense Matching</string>
+         </property>
+         <widget class="QSplitter" name="splitter_10">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>30</y>
+            <width>220</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>220</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QPushButton" name="saveFeat_1">
+           <property name="text">
+            <string>Save Feat. 1</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="saveFeat_2">
+           <property name="text">
+            <string>Save Feat. 2</string>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QSplitter" name="splitter_13">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>160</y>
+            <width>220</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>220</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Line Width</string>
+           </property>
+          </widget>
+          <widget class="QSlider" name="lineWidthSlider">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QSplitter" name="splitter_11">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>95</y>
+            <width>220</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>220</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>216</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QPushButton" name="showSeleMatch">
            <property name="minimumSize">
             <size>
-             <width>220</width>
-             <height>250</height>
+             <width>105</width>
+             <height>25</height>
             </size>
            </property>
-           <property name="sizeIncrement">
+           <property name="maximumSize">
             <size>
-             <width>220</width>
-             <height>250</height>
+             <width>105</width>
+             <height>25</height>
             </size>
            </property>
-           <property name="title">
-            <string>Local Dense Matching</string>
+           <property name="text">
+            <string>Show Pt-Pairs</string>
            </property>
-           <widget class="QSplitter" name="splitter_10">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>25</y>
-              <width>220</width>
-              <height>25</height>
-             </rect>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>220</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <widget class="QPushButton" name="saveFeat_1">
-             <property name="text">
-              <string>Save Feat. 1</string>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="saveFeat_2">
-             <property name="text">
-              <string>Save Feat. 2</string>
-             </property>
-            </widget>
-           </widget>
-           <widget class="QSplitter" name="splitter_13">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>124</y>
-              <width>220</width>
-              <height>25</height>
-             </rect>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>220</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Line Width</string>
-             </property>
-            </widget>
-            <widget class="QSlider" name="lineWidthSlider">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </widget>
-           <widget class="QSplitter" name="splitter_11">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>59</y>
-              <width>220</width>
-              <height>25</height>
-             </rect>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>220</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>216</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <widget class="QPushButton" name="showSeleMatch">
-             <property name="minimumSize">
-              <size>
-               <width>105</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>105</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Show Pt-Pairs</string>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="denseLocalMatch">
-             <property name="minimumSize">
-              <size>
-               <width>105</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>105</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Match Feats.</string>
-             </property>
-            </widget>
-           </widget>
-           <widget class="QSplitter" name="splitter_12">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>92</y>
-              <width>220</width>
-              <height>25</height>
-             </rect>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>220</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>216</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <widget class="QPushButton" name="drawMatches">
-             <property name="minimumSize">
-              <size>
-               <width>105</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>105</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Draw Matches</string>
-             </property>
-            </widget>
-            <widget class="QPushButton" name="removeLines">
-             <property name="minimumSize">
-              <size>
-               <width>105</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>105</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Remove Lines</string>
-             </property>
-            </widget>
-           </widget>
           </widget>
-         </item>
-         <item row="1" column="0">
-          <spacer name="verticalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
+          <widget class="QPushButton" name="denseLocalMatch">
+           <property name="minimumSize">
             <size>
-             <width>20</width>
-             <height>370</height>
+             <width>105</width>
+             <height>25</height>
             </size>
            </property>
-          </spacer>
-         </item>
-        </layout>
+           <property name="maximumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Local Match</string>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QSplitter" name="splitter_12">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>128</y>
+            <width>220</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>220</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>216</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QPushButton" name="drawMatches">
+           <property name="minimumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Draw Matches</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="removeLines">
+           <property name="minimumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Remove Lines</string>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QSplitter" name="splitter_14">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>60</y>
+            <width>220</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>220</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>216</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QLabel" name="label_3">
+           <property name="minimumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Search Radius</string>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="denseSearchRadius">
+           <property name="minimumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>0.01</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QPushButton" name="showDensePairs">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>190</y>
+            <width>105</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>105</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>105</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="sizeIncrement">
+           <size>
+            <width>105</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Show denPairs</string>
+          </property>
+         </widget>
+         <widget class="QSplitter" name="splitter_15">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>220</y>
+            <width>220</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>220</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>216</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QPushButton" name="propaMatch">
+           <property name="minimumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Propa. Match</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="pushButton_2">
+           <property name="minimumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>PushButton</string>
+           </property>
+          </widget>
+         </widget>
+         <widget class="QSplitter" name="splitter_16">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>250</y>
+            <width>220</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>220</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>216</width>
+            <height>25</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QLabel" name="label_4">
+           <property name="minimumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Propa. Num.</string>
+           </property>
+          </widget>
+          <widget class="QLineEdit" name="propaNumber">
+           <property name="minimumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>105</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>2</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </widget>
+        </widget>
        </widget>
       </widget>
       <widget class="QSplitter" name="splitter_8">

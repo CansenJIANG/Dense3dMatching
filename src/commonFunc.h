@@ -57,6 +57,21 @@ namespace commonFunc
             }
         }
     }
+
+
+    inline bool sort_triplet(const triplet<s16, s16, f32> &left,
+                             const triplet<s16, s16, f32> &right)
+    {
+        return left.matchDist < right.matchDist;
+    }
+
+    inline bool unique_triplet( const triplet<s16, s16, f32> &left,
+                                const triplet<s16, s16, f32> &right)
+    {
+        return ( (left.idxRef == right.idxRef) &
+                 (left.idxMot == right.idxMot) &
+                 (left.matchDist == right.matchDist) );
+    }
 }
 
 ///////////////////////////////////

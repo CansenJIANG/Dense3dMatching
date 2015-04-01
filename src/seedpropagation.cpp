@@ -4,17 +4,6 @@ seedPropagation::seedPropagation()
 {
 }
 
-/////////////////////////////////////////////////////////////////////////////////////
-/// Func to propagate the matcing from seeds
-/////////////////////////////////////////////////////////////////////////////////////
-void seedPropagation::propagateMatching(const PointCloudT::Ptr &cloudRef,
-                                        const PointCloudT::Ptr &seedRef,
-                                        const PointCloudT::Ptr &cloudMot,
-                                        const PointCloudT::Ptr &seedMot,
-                                        str_seedPropagation &strSeedPropag)
-{
-
-}
 
 /////////////////////////////////////////////////////////////////////////////////////
 /// Func to search Knn neighbors from seeds
@@ -34,7 +23,6 @@ void seedPropagation::getKnnNearestK(const PointCloudT::Ptr &ptQuery,
         kdTree.nearestKSearch(pQuery, 1, knnIdx, knnDist);
         neighIdx.push_back(knnIdx[0]);
         neighDist.push_back(knnDist[0]);
-        //        std::cout<<"idx = "<<knnIdx[0]<<", ";
     }
 }
 
@@ -51,13 +39,55 @@ void seedPropagation::getKnnRadius(const PointCloudT::Ptr &cloud,
     kdTree.setInputCloud(cloud);
     std::vector<s16> knnIdx;
     std::vector<f32> knnDist;
+
+    //    std::string fileName = "checkKnnDist.txt";
+    //    std::ofstream ofile;
+    // create a new file or select the existing files to continue saving selected features
+    //    ofile.open(fileName.c_str(), std::ios_base::app);
     for(size_t i = 0; i<ptQuery->points.size(); i++)
     {
         PointT pQuery = ptQuery->points.at(i);
         kdTree.radiusSearch(pQuery, searchRadius, knnIdx, knnDist);
         neighIdx.push_back(knnIdx);
-        //        std::cout<<"Knn neighbors found: "<<knnIdx.size();
+        //        for(size_t j=0; j<knnDist.size();j++)
+        //        {
+        //            ofile << knnDist.at(j)<<"\n";
+        //        }
+        //        ofile <<"\n\n";
     }
+    //    ofile.close();
+}
+// overload func with knn distance output
+void seedPropagation::getKnnRadius(const PointCloudT::Ptr &cloud,
+                                   const PointCloudT::Ptr &ptQuery,
+                                   const f32& searchRadius,
+                                   std::vector< std::vector<s16> > &neighIdx,
+                                   std::vector< std::vector<f32> > &neighDist)
+{
+    pcl::KdTreeFLANN<PointT> kdTree;
+    kdTree.setInputCloud(cloud);
+    std::vector<s16> knnIdx;
+    std::vector<f32> knnDist;
+
+    //    std::string fileName = "checkKnnDist.txt";
+    //    std::ofstream ofile;
+    // create a new file or select the existing files to continue saving selected features
+    //    ofile.open(fileName.c_str(), std::ios_base::app);
+    for(size_t i = 0; i<ptQuery->points.size(); i++)
+    {
+        PointT pQuery = ptQuery->points.at(i);
+        kdTree.radiusSearch(pQuery, searchRadius, knnIdx, knnDist);
+        neighIdx.push_back(knnIdx);
+        neighDist.push_back(knnDist);
+        knnIdx.clear();
+        knnDist.clear();
+        //        for(size_t j=0; j<knnDist.size();j++)
+        //        {
+        //            ofile << knnDist.at(j)<<"\n";
+        //        }
+        //        ofile <<"\n\n";
+    }
+    //    ofile.close();
 }
 /////////////////////////////////////////////////////////////////////////////////////
 /// Func to get the indexed points from point cloud
@@ -84,10 +114,7 @@ void seedPropagation::matchKnnNeighbors(const PointCloudT::Ptr &knnRef,
                                         std::vector<s16> &knnIdxMot,
                                         std::vector< triplet<s16, s16, f32> > &newMatches)
 {
-    //    for(uc8 i=0; i<knnIdxRef.size(); i++)
-    //    {
-    //        idxPts->points.push_back(cloud->points.at(knnIdxRef[i]));
-    //    }
+
 }
 
 
@@ -129,10 +156,13 @@ void seedPropagation::crossMatching(const std::vector<s16> &idxRef2Mot,
             matchTriplet.idxMot = knnIdxMot.at( idxRef2Mot.at(i) );
             matchTriplet.matchDist = distRef2Mot.at(i);
             newMatches.push_back(matchTriplet);
-            std::cout<<"idxRef = "<< matchTriplet.idxRef<<", idxMot = "<<matchTriplet.idxMot<<"; ";
         }
     }
-    std::cout<<"matches size after crossMatching: "<<newMatches.size()<<std::endl;
+    std::cout<<"crossMatching size before unique: "<<newMatches.size()<<std::endl;
+    std::sort(newMatches.begin(), newMatches.end(), commonFunc::sort_triplet);
+    newMatches.erase(std::unique(newMatches.begin(), newMatches.end(),
+                                 commonFunc::unique_triplet), newMatches.end());
+    std::cout<<"crossMatching size after unique: "<<newMatches.size()<<std::endl;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -228,6 +258,81 @@ void seedPropagation::localMatching(const PointCloudT::Ptr &cloudRef,
                              strSeedPropag.denseMatches);
         std::cout<<"size of new matches is: "<< strSeedPropag.denseMatches.size()<<std::endl;
     }
-    //    PointT seedR = seedRef->points.at(0);
-    //    PointT seedM = seedMot->points.at(0);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+/// Func to propagate the matcing from seeds
+/////////////////////////////////////////////////////////////////////////////////////
+void seedPropagation::propagateMatching(const PointCloudT::Ptr &cloudRef,                                        
+                                        const PointCloudT::Ptr &cloudMot,
+                                        PointCloudT::Ptr &seedRef,
+                                        PointCloudT::Ptr &seedMot,
+                                        str_seedPropagation &strSeedPropag)
+{
+    std::vector< std::vector<s16> > knnIdxRef;
+    std::vector< std::vector<s16> > knnIdxMot;
+    std::vector< std::vector<f32> > knnDistRef;
+    std::vector< std::vector<f32> > knnDistMot;
+
+    std::cout<<"start dense matching using propagation...\n";
+
+    // take 10% of the best matching as seed for next dense matching
+    // how to stop?
+    uc8 stopNow = 0;
+    while(stopNow<strSeedPropag.propaNumber)
+    {
+        // get the knn neighbors of the seeds
+        getKnnRadius(cloudRef, seedRef, strSeedPropag.searchRadius, knnIdxRef, knnDistRef);
+        getKnnRadius(cloudMot, seedMot, strSeedPropag.searchRadius, knnIdxMot, knnDistMot);
+
+        std::cout<<"cloudRef size: "<<cloudRef->points.size()
+                <<", cloudMot size: "<<cloudMot->points.size()<<std::endl;
+
+        std::cout<<"seedRef size: "<<seedRef->points.size()
+                <<", seedMot size: "<<seedMot->points.size()<<std::endl;
+
+        std::cout<<"get knn radius done.\n";
+
+        // First loop for all the seeds
+        for(u16 i=0; i<seedRef->points.size();i++)
+        {
+            PointCloudT::Ptr idxPtsRef (new PointCloudT);
+            PointCloudT::Ptr idxPtsMot (new PointCloudT);
+
+            // Get the knn neighbors from point cloud
+            copyIdxPtsFromCloud(knnIdxRef[i], cloudRef, idxPtsRef);
+            copyIdxPtsFromCloud(knnIdxMot[i], cloudMot, idxPtsMot);
+
+            std::cout<<"copy knn idxed points done.\n";
+
+            std::cout<<"idxPtsRef size: "<<idxPtsRef->points.size()
+                    <<", idxPtsMot size: "<<idxPtsMot->points.size()<<std::endl;
+
+            matchKnnNeighbKdTree(idxPtsRef, idxPtsMot, knnIdxRef[i], knnIdxMot[i],
+                                 strSeedPropag.denseMatches);
+
+            std::cout<<"size of new matches is: "<< strSeedPropag.denseMatches.size()<<std::endl;
+
+            std::cout<<"match neighbors kdTree done.\n";
+        }
+
+        seedRef->clear();
+        seedMot->clear();
+        // sort the matching result, propagation only take 10% of best matching
+        for(u16 i=0; i<strSeedPropag.denseMatches.size(); i++)
+        {
+            triplet<s16, s16, f32> tmpTriplet = strSeedPropag.denseMatches.at(i);
+            seedRef->push_back(cloudRef->points.at(tmpTriplet.idxRef));
+            seedMot->push_back(cloudMot->points.at(tmpTriplet.idxMot));
+        }
+        std::cout<<"updated size of seeds: "<<seedRef->points.size()<<", "
+                <<seedMot->points.size()<<std::endl;
+        std::cout<<"sore triplet done.\n";
+
+        //        for(int j=0; j<50; j+=5)
+        //        {
+        //            std::cout<<strSeedPropag.denseMatches.at(j).matchDist<<std::endl;
+        //        }
+        ++stopNow;
+    }
 }

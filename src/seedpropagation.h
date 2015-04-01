@@ -16,6 +16,11 @@ struct str_seedPropagation{
     f32 motDist;
     // denseMatching result
     std::vector< triplet<s16, s16, f32> > denseMatches;
+    PointCloudT::Ptr denseRef;
+    PointCloudT::Ptr denseMot;
+
+    // propagation number
+    s16 propaNumber;
 };
 
 class seedPropagation
@@ -29,13 +34,17 @@ public:
                        str_seedPropagation& strSeedPropag);
 
     // matching propagation
-    void propagateMatching(const PointCloudT::Ptr &cloudRef, const PointCloudT::Ptr &seedRef,
-                           const PointCloudT::Ptr &cloudMot, const PointCloudT::Ptr &seedMot,
+    void propagateMatching(const PointCloudT::Ptr &cloudRef, const PointCloudT::Ptr &cloudMot,
+                           PointCloudT::Ptr &seedRef, PointCloudT::Ptr &seedMot,
                            str_seedPropagation& strSeedPropag);
 
     // get Knn neighbors Radius search
     void getKnnRadius(const PointCloudT::Ptr &cloud, const PointCloudT::Ptr &ptQuery,
                       const f32 &searchRadius, std::vector< std::vector<s16> > &neighIdx);
+
+    void getKnnRadius(const PointCloudT::Ptr &cloud, const PointCloudT::Ptr &ptQuery,
+                      const f32 &searchRadius, std::vector< std::vector<s16> > &neighIdx,
+                      std::vector< std::vector<f32> > &neighDist);
 
     // get Knn neighbors Nearest search
     void getKnnNearestK(const PointCloudT::Ptr &cloud, const PointCloudT::Ptr &ptQuery,

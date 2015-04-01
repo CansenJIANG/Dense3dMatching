@@ -62,16 +62,19 @@ pclQviewer::pclQviewer (QWidget *parent) :
     // Output message
     ui->outputMsg->appendPlainText(QString("Program start ..."));
 
-    cb_args.ptColor[0] = 255;
     cb_args.ptColor[0] = 0;
-    cb_args.ptColor[0] = 0;
+    cb_args.ptColor[1] = 255;
+    cb_args.ptColor[2] = 0;
 
     // params setting
     seedPropaParams.colorThd = 0.0;
     seedPropaParams.descrThd = 0.0;
     seedPropaParams.motDist  = 0.02;
+    seedPropaParams.propaNumber  = 2;
     seedPropaParams.searchRadius = 0.01;
     seedPropaParams.denseMatches.resize(0);
+    seedPropaParams.denseRef.reset(new PointCloudT);
+    seedPropaParams.denseMot.reset(new PointCloudT);
 
     drawObjsParams.lineDrawOn = 0;
     drawObjsParams.lineIdx = 0;
@@ -354,8 +357,8 @@ clickPoint_callback (const pcl::visualization::PointPickingEvent& event, void* a
     }
 
     // avoid multiple selections of same feature
-    f32        tree_distance = 100000.0;
-    uc8    save_feature  = 1;
+    f32 tree_distance = 100000.0;
+    uc8 save_feature  = 1;
     u16 i = featureNb, stop_loop = 50;
     PointT *tree_feature = &data->clicked_points_3d->points[featureNb];
     // variable stop_loop to avoid infinite searching of duplicate points
@@ -502,8 +505,7 @@ pclQviewer::on_delOnePt_clicked()
         featurePts->points.pop_back();
 
         // update the point cloud
-        uc8 pColor[3] = {0, 255, 0};
-        this->drawKeyPts(featurePts, "selected_features", pColor, 10);
+        this->drawKeyPts(featurePts, "selected_features", cb_args.ptColor, 10);
         ui->outputMsg->appendPlainText( QString("Previous selected features deleted.\n") );
     }
     else
@@ -609,7 +611,7 @@ pclQviewer::drawMatches(PointCloudT::Ptr &corr_1, PointCloudT::Ptr & corr_2,
         ++pt_2;
         ++idxLine;
     }
-    //    featDescrStr.lineIdx = idxLine;
+    drawObjsParams.lineIdx = idxLine;
     ui->qvtkWidget->update();
 }
 
@@ -670,10 +672,8 @@ pclQviewer::on_loadMatchIdx_clicked()
             u16 idx_tmp = 0;
             readMatchFile >> idx_tmp;
             featDescrStr.matchIdx1.push_back(idx_tmp);
-            std::cout<< idx_tmp <<", ";
             readMatchFile >> idx_tmp;
             featDescrStr.matchIdx2.push_back(idx_tmp);
-            std::cout<< idx_tmp <<"\n";
         }
     }
     readMatchFile.close();
@@ -772,6 +772,101 @@ pclQviewer::on_clipPC_clicked()
     //        ui->qvtkWidget->update();
     //    }
     ui->outputMsg->appendPlainText( "Clipping is deactivated...");
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+///// Save draw dense matching
+///////////////////////////////////////////////////////////////////////////////////////
+void pclQviewer::on_drawMatches_clicked()
+{
+    if(seedPropaParams.denseMatches.size()<1){return;}
+
+    if(drawObjsParams.lineIdx != 0)
+    {
+        ui->removeLines->click();
+    }
+    std::cout<<"size of dense matches: "
+            <<seedPropaParams.denseMatches.size()<<"\n";
+
+    std::vector<f32> matchDist;
+    triplet<s16,s16,f32> tmpMatch;
+    for(int i=0; i<seedPropaParams.denseMatches.size();i++)
+    {
+        tmpMatch = seedPropaParams.denseMatches.at(i);
+        matchDist.push_back(tmpMatch.matchDist);
+    }
+
+    f32 medianDist = 0;
+    if (drawObjsParams.goodMatches)
+    {// draw only half of the good matches
+        medianDist = getMedian(matchDist);
+    }
+    matchDist.clear();
+    // get correspondences
+    for(int i=0; i<seedPropaParams.denseMatches.size();i++)
+    {
+        tmpMatch = seedPropaParams.denseMatches.at(i);
+        if(!drawObjsParams.goodMatches | tmpMatch.matchDist<medianDist)
+        {
+            seedPropaParams.denseRef->push_back( cloud->points.at(tmpMatch.idxRef) );
+            seedPropaParams.denseMot->push_back( cloud2->points.at(tmpMatch.idxMot) );
+            matchDist.push_back(tmpMatch.matchDist);
+        }
+    }
+    drawMatches(seedPropaParams.denseRef, seedPropaParams.denseMot, matchDist, cb_args.ptColor);
+    drawObjsParams.lineDrawOn = 1;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+///// assign searching radius for dense matching
+///////////////////////////////////////////////////////////////////////////////////////
+void pclQviewer::on_denseSearchRadius_editingFinished()
+{
+    seedPropaParams.searchRadius = ui->denseSearchRadius->text().toFloat();
+}
+void pclQviewer::on_propaNumber_editingFinished()
+{
+    seedPropaParams.propaNumber = ui->propaNumber->text().toInt();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+///// show dense matching pairs
+///////////////////////////////////////////////////////////////////////////////////////
+void pclQviewer::on_showDensePairs_clicked()
+{
+    QString showMatches = "Show denPairs";
+    QString hideMatches = "Hide denPairs";
+
+    if(seedPropaParams.denseRef->points.size()<1 | seedPropaParams.denseRef->points.size()<1)
+    {
+        return;
+    }
+    // switch show/hide state to control the visualization of keypts
+    if( QString ::compare( showMatches, ui->showDensePairs->text(), Qt::CaseInsensitive) )
+    {
+        ui->showDensePairs->setText(showMatches);
+        viewer->removePointCloud("densePair_1");
+        viewer->removePointCloud("densePair_2");
+        ui->outputMsg->appendPlainText(QString("Dense matching pairs are hidden"));
+    }else
+    {
+        ui->showDensePairs->setText(hideMatches);
+        PointColor densePairColor_1 (seedPropaParams.denseRef, cb_args.ptColor[0],
+                cb_args.ptColor[1], cb_args.ptColor[2]);
+        viewer->addPointCloud(seedPropaParams.denseRef,densePairColor_1,"densePair_1");
+        viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,
+                                                 10, "densePair_1");
+
+        PointColor densePairColor_2 (seedPropaParams.denseMot, cb_args.ptColor[1],
+                cb_args.ptColor[0], cb_args.ptColor[2]);
+        viewer->addPointCloud(seedPropaParams.denseMot,densePairColor_2,"densePair_2");
+        viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE,
+                                                 10, "densePair_2");
+
+        ui->outputMsg->appendPlainText(QString("Dense matching pairs are shown."));
+
+    }
+    ui->qvtkWidget->update();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -895,8 +990,8 @@ pclQviewer::on_denseLocalMatch_clicked()
 
         // show the knn neighbors
         uc8 colorKnn_1[3] = {0, 255, 0}, colorKnn_2[3] = {255, 0, 0};
-        drawKeyPts(idxPtsRef,"feat_1", colorKnn_1,10);
-        drawKeyPts(idxPtsMot,"feat_2", colorKnn_2,10);
+        drawKeyPts(idxPtsRef,"feat_1", colorKnn_1, 10);
+        drawKeyPts(idxPtsMot,"feat_2", colorKnn_2, 10);
         std::cout<<"draw knn neighbors done! \n";
     }
 
@@ -914,49 +1009,35 @@ pclQviewer::on_denseLocalMatch_clicked()
     ui->qvtkWidget->update();
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////////////
-///// Save draw dense matching
+///// show dense matching pairs
 ///////////////////////////////////////////////////////////////////////////////////////
-void pclQviewer::on_drawMatches_clicked()
+void pclQviewer::on_propaMatch_clicked()
 {
-    if(seedPropaParams.denseMatches.size()<1){return;}
+    // create a matcher object
+    seedPropagation denseMatcher;
+    Eigen::Matrix4f transMat = Eigen::Matrix4f::Identity();
 
-    PointCloudT::Ptr corr_1 (new PointCloudT);
-    PointCloudT::Ptr corr_2 (new PointCloudT);
+    // rigid transformation of point cloud from sparse matches
+    denseMatcher.getTransformMatrix(clickFeat_1, clickFeat_2, transMat);
 
-    if(drawObjsParams.lineIdx != 0)
-    {
-        ui->removeLines->click();
-    }
-    std::cout<<"size of dense matches: "
-            <<seedPropaParams.denseMatches.size()<<"\n";
+    // point cloud alignment using inverse of rigid transformation
+    pcl::transformPointCloud(*clickFeat_1, *clickFeat_1, transMat);
+    pcl::transformPointCloud(*cloud, *cloud, transMat);
 
-    std::vector<f32> matchDist;
-    triplet<s16,s16,f32> tmpMatch;
-    for(int i=0; i<seedPropaParams.denseMatches.size();i++)
-    {
-        tmpMatch = seedPropaParams.denseMatches.at(i);
-        matchDist.push_back(tmpMatch.matchDist);
-    }
+    // local dense matching
+    denseMatcher.propagateMatching(cloud, cloud2, clickFeat_1, clickFeat_2,
+                                   seedPropaParams);
 
-    f32 medianDist = 0;
-    if (drawObjsParams.goodMatches)
-    {// draw only half of the good matches
-        medianDist = getMedian(matchDist);
-    }
-    matchDist.clear();
-    // get correspondences
-    for(int i=0; i<seedPropaParams.denseMatches.size();i++)
-    {
-        tmpMatch = seedPropaParams.denseMatches.at(i);
-        if(!drawObjsParams.goodMatches | tmpMatch.matchDist<medianDist)
-        {
-            corr_1->push_back( cloud->points.at(tmpMatch.idxRef) );
-            corr_2->push_back( cloud2->points.at(tmpMatch.idxMot) );
-            matchDist.push_back(tmpMatch.matchDist);
-        }
-    }
-
-    drawMatches(corr_1, corr_2, matchDist, keyPtsStr.viewColor);
-    featDescrStr.lineDrawOn = 1;
+    // shift point cloud to visualize the matching result
+    transMat = Eigen::Matrix4f::Identity();
+    transMat(2,3) = 0.2;
+    pcl::transformPointCloud(*clickFeat_1, *clickFeat_1, transMat);
+    pcl::transformPointCloud(*cloud, *cloud, transMat);
+    viewer->removePointCloud("cloud");
+    viewer->addPointCloud(cloud, "cloud");
+    ui->showSeleMatch->click();
+    ui->qvtkWidget->update();
 }
+

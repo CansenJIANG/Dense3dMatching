@@ -122,6 +122,8 @@ struct triplet
     T2 idxMot;
     T3 matchDist;
 };
+
+
 #endif // COMMONHEADER_H
 
 
